@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avaliebus - Qualidade no Transporte</title>
+    <style>
+        :root { 
+            --primary: #00b894; 
+            --secondary: #0984e3; 
+            --warning: #fdcb6e; 
+            --danger: #d63031; 
+            --dark: #2d3436; 
+            --light: #f1f2f6; 
+            --success-light: #55efc4;
+        }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--light); margin: 0; padding: 0; }
+        
+        .app-container { max-width: 500px; margin: 0 auto; background: #fff; min-height: 100vh; display: flex; flex-direction: column; }
+        .header { background: var(--primary); color: white; padding: 25px 20px; text-align: center; }
+        .header h1 { margin: 0; font-size: 1.8rem; letter-spacing: 1px; }
+        
+        .card { margin: 15px; padding: 20px; border-radius: 15px; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; }
+        .btn { border: none; border-radius: 12px; padding: 18px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.3s; font-size: 1rem; margin-top: 10px; outline: none; }
+        
+        /* Efeitos Botoes Lotação */
+        .btn-lot { border: 3px solid transparent; opacity: 0.9; }
+        .btn-lot:hover { opacity: 1; transform: translateY(-2px); }
+        .btn-vazio { background: var(--primary); color: white; }
+        .btn-medio { background: var(--warning); color: var(--dark); }
+        .btn-lotado { background: var(--danger); color: white; }
+        
+        .btn-selected { 
+            border-color: #000 !important; 
+            transform: scale(1.05); 
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.8), 0 5px 10px rgba(0,0,0,0.2);
+            opacity: 1;
+        }
+
+        .btn-enviar {
+            background: var(--success-light);
+            color: var(--dark);
+            box-shadow: 0 4px 10px rgba(85, 239, 196, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-enviar:hover {
+            background: #00d1b2;
+            box-shadow: 0 6px 20px rgba(85, 239, 196, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .wait-badge {
+            background: #e1f5fe;
+            color: #01579b;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            border: 1px solid #b3e5fc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.95rem;
+        }
+
+        .step-container { display: none; padding: 10px; }
+        .step-active { display: block; animation: fadeIn 0.4s; }
+
+        .timer-display { font-size: 3.5rem; font-weight: 800; color: var(--secondary); margin: 20px 0; font-family: monospace; }
+        .input-box { width: 100%; padding: 15px; font-size: 1.2rem; text-align: center; border: 2px solid #ddd; border-radius: 12px; margin-bottom: 12px; box-sizing: border-box; }
+        .section-title { color: var(--secondary); border-left: 5px solid var(--secondary); padding-left: 12px; margin: 25px 0 10px 0; font-size: 1.1rem; font-weight: 800; text-transform: uppercase; }
+        .rating-box { background: #f8f9fa; padding: 12px; border-radius: 12px; border: 1px solid #eee; margin-bottom: 10px; }
+        .rating-box label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.85rem; color: #555; }
+        .rating-box select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; }
+        .check-group { background:#fff5f5; padding: 15px; border-radius: 12px; border: 1px solid #ffe3e3; }
+        .check-item { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 0.95rem; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <div class="header">
+            <h1>Avaliebus</h1>
+            <p>Participe e ajude a melhorar a qualidade do transporte público</p>
+        </div>
+
+        <div id="step1" class="step-container step-active">
+            <div class="card" style="text-align: center; padding: 40px 20px;">
+                <div style="font-size: 4rem; margin-bottom: 10px;">📍</div>
+                <h3>Chegou no ponto agora?</h3>
+                <p>Toque no botão abaixo para iniciarmos a medição da sua espera.</p>
+                <button class="btn" style="background: var(--secondary); color:white;" onclick="startWait()">CHEGUEI NO PONTO AGORA</button>
+            </div>
+        </div>
+
+        <div id="step2" class="step-container">
+            <div class="card" style="text-align: center;">
+                <h3 style="color: #666;">Tempo de espera:</h3>
+                <div id="timer" class="timer-display">00:00</div>
+                <button class="btn" style="background: var(--primary); color:white;" onclick="showStep(3)">SUBI NO ÔNIBUS</button>
+            </div>
+        </div>
+
+        <div id="step3" class="step-container">
+            <div class="card">
+                <div id="wait-badge" class="wait-badge">
+                    <span>⏱️</span> <span id="wait-msg-text"></span>
+                </div>
+
+                <h2 style="text-align:center; margin-top:0;">Avaliação</h2>
+                
+                <div class="section-title">Identificação</div>
+                <input type="text" id="bus_line" class="input-box" placeholder="Linha ou Número do Ônibus">
+
+                <div class="section-title">Tempo de Espera</div>
+                <div class="rating-box">
+                    <label>Como você avalia o tempo que esperou?</label>
+                    <select id="r_espera_nota">
+                        <option value="5">5★ Muito Rápido</option>
+                        <option value="4">4★ Aceitável</option>
+                        <option value="3" selected>3★ Regular</option>
+                        <option value="2">2★ Demorado</option>
+                        <option value="1">1★ Péssimo / Muito Atrasado</option>
+                    </select>
+                </div>
+
+                <div class="section-title">Farol de Lotação</div>
+                <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+                    <button class="btn btn-lot btn-vazio" id="btn-v" onclick="setCrowd('Vazio', 'btn-v')">VAZIO</button>
+                    <button class="btn btn-lot btn-medio" id="btn-m" onclick="setCrowd('Médio', 'btn-m')">MÉDIO</button>
+                    <button class="btn btn-lot btn-lotado" id="btn-l" onclick="setCrowd('Lotado', 'btn-l')">LOTADO</button>
+                </div>
+
+                <div class="section-title">Atendimento Prestado</div>
+                <div class="rating-box">
+                    <label>Motorista (Educação/Condução)</label>
+                    <select id="r_motorista"><option>5★</option><option>4★</option><option selected>3★</option><option>2★</option><option>1★</option></select>
+                </div>
+                <div class="rating-box">
+                    <label>Cobrador (Educação/Atendimento)</label>
+                    <select id="r_cobrador"><option>5★</option><option>4★</option><option selected>3★</option><option>2★</option><option>1★</option><option>Não tem</option></select>
+                </div>
+
+                <div class="section-title">Conservação do Veículo</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="rating-box"><label>Limpeza</label><select id="r_limpeza"><option>5★</option><option selected>3★</option><option>1★</option></select></div>
+                    <div class="rating-box"><label>Bancos</label><select id="r_bancos"><option>5★</option><option selected>3★</option><option>1★</option></select></div>
+                </div>
+                <div class="rating-box">
+                    <label>Ar Condicionado / Ventilação</label>
+                    <select id="r_ar"><option>Excelente</option><option selected>Regular</option><option>Quebrado/Desligado</option></select>
+                </div>
+
+                <div class="section-title">Presenciou algo do tipo hoje?</div>
+                <div class="check-group">
+                    <label class="check-item"><input type="checkbox" id="c_assedio"> ⚠️ Assédio</label>
+                    <label class="check-item"><input type="checkbox" id="c_assalto"> ⚠️ Assalto / Roubo</label>
+                    <label class="check-item"><input type="checkbox" id="c_idosos"> Desrespeito a Idosos / PCD</label>
+                    <label class="check-item"><input type="checkbox" id="c_briga"> Brigas ou Confusões</label>
+                    <label class="check-item"><input type="checkbox" id="c_direcao"> Direção Perigosa</label>
+                </div>
+
+                <button class="btn btn-enviar" onclick="finishSurvey()">Enviar Avaliação</button>
+            </div>
+        </div>
+
+        <div id="step4" class="step-container" style="text-align: center; padding: 80px 20px;">
+            <div style="font-size: 5rem; margin-bottom: 20px;">✅</div>
+            <h2>Avaliação enviada com sucesso!</h2>
+            <p style="color:#666; font-size: 1.1rem;">Obrigado por colaborar. Sua voz ajuda a construir um transporte público melhor para todos.</p>
+        </div>
+    </div>
+
+    <script>
+        let startTime, waitInterval;
+        let busData = { espera: 0, lotacao: '' };
+
+        function startWait() { 
+            startTime = new Date(); 
+            showStep(2); 
+            waitInterval = setInterval(updateTimer, 1000); 
+        }
+
+        function updateTimer() {
+            let diff = Math.floor((new Date() - startTime) / 1000);
+            let mins = Math.floor(diff/60).toString().padStart(2,'0');
+            let secs = (diff%60).toString().padStart(2,'0');
+            document.getElementById('timer').innerText = mins + ":" + secs;
+            busData.espera = diff;
+        }
+
+        function setCrowd(val, id) {
+            busData.lotacao = val;
+            document.querySelectorAll('.btn-lot').forEach(b => b.classList.remove('btn-selected'));
+            document.getElementById(id).classList.add('btn-selected');
+        }
+
+        function showStep(n) {
+            if(n === 3) {
+                clearInterval(waitInterval);
+                let mins = Math.floor(busData.espera / 60);
+                let msg = mins < 1 ? "Você esperou menos de 1 min por este ônibus." : `Você esperou ${mins} min por este ônibus.`;
+                document.getElementById('wait-msg-text').innerText = msg;
+            }
+            document.querySelectorAll('.step-container').forEach(s => s.classList.remove('step-active'));
+            document.getElementById('step'+n).classList.add('step-active');
+            window.scrollTo(0,0);
+        }
+
+        function finishSurvey() {
+            if(!document.getElementById('bus_line').value || !busData.lotacao) {
+                alert("Por favor, informe a Linha e a Lotação."); return;
+            }
+            showStep(4);
+        }
+    </script>
+</body>
+</html>
