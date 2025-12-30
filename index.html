@@ -3,221 +3,276 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Avaliebus - Qualidade no Transporte</title>
+    <title>Avaliebus - Gestão de Qualidade</title>
     <style>
         :root { 
-            --primary: #00b894; 
-            --secondary: #0984e3; 
-            --warning: #fdcb6e; 
-            --danger: #d63031; 
-            --purple: #6c5ce7;
-            --dark: #2d3436; 
-            --light: #f1f2f6; 
-            --success-light: #55efc4;
+            --primary: #00b894; --secondary: #0984e3; --warning: #fdcb6e; 
+            --danger: #d63031; --purple: #6c5ce7; --dark: #2d3436; 
+            --light: #f1f2f6; --success-light: #55efc4;
         }
         body { font-family: 'Segoe UI', sans-serif; background: var(--light); margin: 0; padding: 0; }
         
-        .app-container { max-width: 500px; margin: 0 auto; background: #fff; min-height: 100vh; display: flex; flex-direction: column; }
-        .header { background: var(--primary); color: white; padding: 25px 20px; text-align: center; }
+        /* Chaves de Alternância - Superior Direito */
+        .nav-toggle { position: absolute; top: 15px; right: 15px; display: flex; gap: 5px; z-index: 100; }
+        .nav-toggle a { color: rgba(255,255,255,0.7); text-decoration: none; cursor: pointer; padding: 4px 12px; border-radius: 15px; font-size: 0.65rem; font-weight: bold; border: 1px solid rgba(255,255,255,0.3); transition: 0.3s; background: rgba(0,0,0,0.1); }
+        .nav-toggle a.active { background: white; color: var(--dark); border-color: white; }
+
+        .app-container { max-width: 500px; margin: 0 auto; background: #fff; min-height: 100vh; display: flex; flex-direction: column; position: relative; }
+        .header { background: var(--primary); color: white; padding: 45px 20px 25px; text-align: center; }
         .header h1 { margin: 0; font-size: 1.8rem; letter-spacing: 1px; }
         .header p { margin: 5px 0 0; font-size: 0.85rem; opacity: 0.9; }
         
         .card { margin: 15px; padding: 20px; border-radius: 15px; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; }
         .btn { border: none; border-radius: 12px; padding: 18px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.3s; font-size: 1rem; margin-top: 10px; outline: none; }
-        
-        /* Efeito Hover Geral para Botões de Ação */
-        .btn:hover { transform: translateY(-3px); filter: brightness(1.1); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .btn:active { transform: translateY(-1px); }
+        .btn:hover { transform: translateY(-3px); filter: brightness(1.1); }
 
-        /* Farol Horizontal e Hovers Específicos */
+        /* Farol Horizontal */
         .farol-container { display: flex; gap: 4px; margin-bottom: 10px; }
         .btn-lot { border: 3px solid transparent; padding: 12px 2px; font-size: 0.65rem; flex: 1; text-transform: uppercase; transition: 0.2s; }
-        
         .btn-vazio { background: var(--primary); color: white; }
         .btn-medio { background: var(--warning); color: var(--dark); }
         .btn-lotado { background: var(--danger); color: white; }
         .btn-super { background: var(--purple); color: white; }
-        
-        .btn-lot:hover { opacity: 1; transform: scale(1.02); filter: brightness(1.15); border-color: rgba(255,255,255,0.5); }
+        .btn-selected { border-color: #000 !important; transform: scale(1.05) !important; z-index: 1; }
 
-        .btn-selected { 
-            border-color: #000 !important; 
-            transform: scale(1.05) !important; 
-            box-shadow: 0 0 12px rgba(255, 255, 255, 0.9) !important;
-            z-index: 1;
-        }
+        /* Dashboard ADM */
+        .dash-card { border-left: 8px solid var(--secondary); margin-bottom: 15px; background: #fff; padding: 15px; border-radius: 10px; border: 1px solid #eee; cursor: pointer; }
+        .details-area { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #ccc; }
+        .detail-item { background: #f8f9fa; padding: 12px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #eee; font-size: 0.8rem; line-height: 1.5; }
+        .tag-nota { background: #e0e0e0; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; margin-right: 4px; display: inline-block; margin-top: 4px; font-weight: bold; }
 
-        .btn-enviar {
-            background: var(--success-light);
-            color: var(--dark);
-            box-shadow: 0 4px 10px rgba(85, 239, 196, 0.3);
-        }
-
-        .wait-badge {
-            background: #e1f5fe;
-            color: #01579b;
-            padding: 15px;
-            border-radius: 12px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            border: 1px solid #b3e5fc;
-            text-align: center;
-            font-size: 0.9rem;
-        }
+        .section-title { color: var(--secondary); border-left: 5px solid var(--secondary); padding-left: 12px; margin: 25px 0 10px 0; font-size: 0.95rem; font-weight: 800; text-transform: uppercase; }
+        .rating-box { background: #f8f9fa; padding: 12px; border-radius: 12px; border: 1px solid #eee; margin-bottom: 10px; }
+        .rating-box label { display: block; font-weight: bold; font-size: 0.8rem; color: #555; }
+        .rating-box select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 0.9rem; }
+        .check-group { background:#fff5f5; padding: 15px; border-radius: 12px; border: 1px solid #ffe3e3; }
+        .check-item { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 0.85rem; }
 
         .step-container { display: none; padding: 10px; }
         .step-active { display: block; animation: fadeIn 0.4s; }
-
-        .timer-display { font-size: 3.5rem; font-weight: 800; color: var(--secondary); margin: 20px 0; font-family: monospace; }
-        .input-box { width: 100%; padding: 15px; font-size: 1.1rem; text-align: center; border: 2px solid #ddd; border-radius: 12px; margin-bottom: 12px; box-sizing: border-box; }
-        .section-title { color: var(--secondary); border-left: 5px solid var(--secondary); padding-left: 12px; margin: 25px 0 10px 0; font-size: 0.95rem; font-weight: 800; text-transform: uppercase; }
-        .rating-box { background: #f8f9fa; padding: 12px; border-radius: 12px; border: 1px solid #eee; margin-bottom: 10px; }
-        .rating-box label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.8rem; color: #555; }
-        .rating-box select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; }
-        .check-group { background:#fff5f5; padding: 15px; border-radius: 12px; border: 1px solid #ffe3e3; }
-        .check-item { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 0.9rem; }
-
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
+    <div class="nav-toggle">
+        <a id="nav-user" class="active" onclick="toggleMode('user')">USUÁRIO</a>
+        <a id="nav-adm" onclick="toggleMode('adm')">ADM</a>
+    </div>
+
     <div class="app-container">
-        <div class="header">
-            <h1>Avaliebus</h1>
-            <p>Participe e ajude a melhorar a qualidade do transporte público</p>
-        </div>
+        
+        <div id="view-user">
+            <div class="header">
+                <h1>Avaliebus</h1>
+                <p>Participe e ajude a melhorar a qualidade do transporte público</p>
+            </div>
 
-        <div id="step1" class="step-container step-active">
-            <div class="card" style="text-align: center; padding: 40px 20px;">
-                <div style="font-size: 4rem; margin-bottom: 10px;">📍</div>
-                <h3>Chegou no ponto agora?</h3>
-                <p>Toque no botão abaixo para iniciarmos a medição da sua espera.</p>
-                <button class="btn" style="background: var(--secondary); color:white;" onclick="startWait()">CHEGUEI NO PONTO AGORA</button>
+            <div id="step1" class="step-container step-active">
+                <div class="card" style="text-align: center; padding: 40px 20px;">
+                    <div style="font-size: 4rem; margin-bottom: 10px;">📍</div>
+                    <h3>Chegou no ponto agora?</h3>
+                    <p>Toque no botão abaixo para iniciarmos a medição da sua espera.</p>
+                    <button class="btn" style="background: var(--secondary); color:white;" onclick="startWait()">CHEGUEI NO PONTO AGORA</button>
+                </div>
+            </div>
+
+            <div id="step2" class="step-container">
+                <div class="card" style="text-align: center;">
+                    <h3 style="color: #666;">Tempo de espera:</h3>
+                    <div id="timer" style="font-size: 3.5rem; font-weight: 800; color: var(--secondary); margin: 20px 0; font-family: monospace;">00:00</div>
+                    <button class="btn" style="background: var(--primary); color:white;" onclick="showStep(3)">SUBI NO ÔNIBUS</button>
+                </div>
+            </div>
+
+            <div id="step3" class="step-container">
+                <div class="card">
+                    <div style="background: #e1f5fe; color:#01579b; margin-bottom:20px; padding: 15px; border-radius: 12px; font-weight: bold; text-align: center; font-size: 0.9rem;">
+                        ⏱️ <span id="wait-msg-text"></span>
+                    </div>
+
+                    <h2 style="text-align:center; margin-top:0;">Avaliação</h2>
+                    
+                    <div class="section-title">Identificação</div>
+                    <input type="text" id="bus_line" class="btn" style="background:white; border:2px solid #ddd; text-align:center; color:black; cursor:text;" placeholder="Linha ou Número do Ônibus">
+
+                    <div class="section-title">Farol de Lotação</div>
+                    <div class="farol-container">
+                        <button class="btn btn-lot btn-vazio" id="btn-v" onclick="setCrowd('Vazio', 'btn-v')">Vazio</button>
+                        <button class="btn btn-lot btn-medio" id="btn-m" onclick="setCrowd('Médio', 'btn-m')">Médio</button>
+                        <button class="btn btn-lot btn-lotado" id="btn-l" onclick="setCrowd('Lotado', 'btn-l')">Lotado</button>
+                        <button class="btn btn-lot btn-super" id="btn-s" onclick="setCrowd('Super Lotado', 'btn-s')">Impossível</button>
+                    </div>
+
+                    <div class="section-title">Tempo de Espera</div>
+                    <div class="rating-box">
+                        <label>Como você avalia o tempo que esperou?</label>
+                        <select id="r_espera_nota">
+                            <option value="5★">5★ Muito Rápido</option><option value="4★">4★ Aceitável</option><option value="3★" selected>3★ Regular</option><option value="2★">2★ Demorado</option><option value="1★">1★ Péssimo</option>
+                        </select>
+                    </div>
+
+                    <div class="section-title">Atendimento Prestado</div>
+                    <div class="rating-box">
+                        <label>Motorista (Educação/Condução)</label>
+                        <select id="r_motorista"><option>5★</option><option>4★</option><option selected>3★</option><option>2★</option><option>1★</option></select>
+                    </div>
+                    <div class="rating-box">
+                        <label>Cobrador (Educação/Atendimento)</label>
+                        <select id="r_cobrador"><option>5★</option><option>4★</option><option selected>3★</option><option>2★</option><option>1★</option><option>Não tem</option></select>
+                    </div>
+
+                    <div class="section-title">Conservação do Veículo</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div class="rating-box"><label>Limpeza</label><select id="r_limpeza"><option>5★</option><option selected>3★</option><option>1★</option></select></div>
+                        <div class="rating-box"><label>Bancos</label><select id="r_bancos"><option>5★</option><option selected>3★</option><option>1★</option></select></div>
+                    </div>
+
+                    <div class="section-title">Presenciou algo do tipo hoje?</div>
+                    <div class="check-group">
+                        <label class="check-item"><input type="checkbox" id="c_vendedor"> 🥖 Vendedores Ambulantes</label>
+                        <label class="check-item"><input type="checkbox" id="c_tras"> 🚪 Entraram pela porta de trás</label>
+                        <label class="check-item"><input type="checkbox" id="c_assedio"> ⚠️ Assédio</label>
+                        <label class="check-item"><input type="checkbox" id="c_assalto"> ⚠️ Assalto / Roubo</label>
+                        <label class="check-item"><input type="checkbox" id="c_idosos"> Desrespeito a Idosos / PCD</label>
+                        <label class="check-item"><input type="checkbox" id="c_briga"> Brigas ou Confusões</label>
+                        <label class="check-item"><input type="checkbox" id="c_direcao"> Direção Perigosa</label>
+                    </div>
+
+                    <div class="section-title">Quem está avaliando?</div>
+                    <input type="text" id="user_name" class="btn" style="background:white; border:2px solid #ddd; text-align:center; color:black; cursor:text; margin-top:10px;" placeholder="Seu Nome (Opcional)">
+
+                    <button class="btn" style="background:var(--success-light); color:var(--dark);" onclick="finishSurvey()">Enviar Avaliação</button>
+                </div>
+            </div>
+
+            <div id="step4" class="step-container" style="text-align: center; padding: 60px 20px;">
+                <div style="font-size: 5rem;">✅</div>
+                <h2>Enviado com sucesso!</h2>
+                <button class="btn" onclick="location.reload()" style="background:#eee; width:auto; padding:10px 20px; font-size:0.8rem;">Nova Avaliação</button>
             </div>
         </div>
 
-        <div id="step2" class="step-container">
-            <div class="card" style="text-align: center;">
-                <h3 style="color: #666;">Tempo de espera:</h3>
-                <div id="timer" class="timer-display">00:00</div>
-                <button class="btn" style="background: var(--primary); color:white;" onclick="showStep(3)">SUBI NO ÔNIBUS</button>
+        <div id="view-adm" style="display:none;">
+            <div class="header" style="background:var(--dark)">
+                <h1>Painel ADM</h1>
+                <p>Relatório Consolidado de Respostas</p>
             </div>
-        </div>
-
-        <div id="step3" class="step-container">
-            <div class="card">
-                <div id="wait-badge" class="wait-badge">
-                    <span>⏱️</span> <span id="wait-msg-text"></span>
-                </div>
-
-                <h2 style="text-align:center; margin-top:0;">Avaliação</h2>
-                
-                <div class="section-title">Identificação</div>
-                <input type="text" id="bus_line" class="input-box" placeholder="Linha ou Número do Ônibus">
-
-                <div class="section-title">Farol de Lotação</div>
-                <div class="farol-container">
-                    <button class="btn btn-lot btn-vazio" id="btn-v" onclick="setCrowd('Vazio', 'btn-v')">Vazio</button>
-                    <button class="btn btn-lot btn-medio" id="btn-m" onclick="setCrowd('Médio', 'btn-m')">Médio</button>
-                    <button class="btn btn-lot btn-lotado" id="btn-l" onclick="setCrowd('Lotado', 'btn-l')">Lotado</button>
-                    <button class="btn btn-lot btn-super" id="btn-s" onclick="setCrowd('Super Lotado', 'btn-s')">Impossível</button>
-                </div>
-
-                <div class="section-title">Tempo de Espera</div>
-                <div class="rating-box">
-                    <label>Como você avalia o tempo que esperou?</label>
-                    <select id="r_espera_nota">
-                        <option value="5">5★ Muito Rápido</option>
-                        <option value="4">4★ Aceitável</option>
-                        <option value="3" selected>3★ Regular</option>
-                        <option value="2">2★ Demorado</option>
-                        <option value="1">1★ Péssimo</option>
-                    </select>
-                </div>
-
-                <div class="section-title">Atendimento Prestado</div>
-                <div class="rating-box">
-                    <label>Motorista (Educação/Condução)</label>
-                    <select id="r_motorista"><option>5★</option><option>4★</option><option selected>3★</option><option>2★</option><option>1★</option></select>
-                </div>
-                <div class="rating-box">
-                    <label>Cobrador (Educação/Atendimento)</label>
-                    <select id="r_cobrador"><option>5★</option><option>4★</option><option selected>3★</option><option>2★</option><option>1★</option><option>Não tem</option></select>
-                </div>
-
-                <div class="section-title">Conservação do Veículo</div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <div class="rating-box"><label>Limpeza</label><select id="r_limpeza"><option>5★</option><option selected>3★</option><option>1★</option></select></div>
-                    <div class="rating-box"><label>Bancos</label><select id="r_bancos"><option>5★</option><option selected>3★</option><option>1★</option></select></div>
-                </div>
-                <div class="rating-box">
-                    <label>Ar Condicionado / Ventilação</label>
-                    <select id="r_ar"><option>Excelente</option><option selected>Regular</option><option>Quebrado/Desligado</option></select>
-                </div>
-
-                <div class="section-title">Presenciou algo do tipo hoje?</div>
-                <div class="check-group">
-                    <label class="check-item"><input type="checkbox" id="c_assedio"> ⚠️ Assédio</label>
-                    <label class="check-item"><input type="checkbox" id="c_assalto"> ⚠️ Assalto / Roubo</label>
-                    <label class="check-item"><input type="checkbox" id="c_idosos"> Desrespeito a Idosos / PCD</label>
-                    <label class="check-item"><input type="checkbox" id="c_briga"> Brigas ou Confusões</label>
-                    <label class="check-item"><input type="checkbox" id="c_direcao"> Direção Perigosa</label>
-                </div>
-
-                <div class="section-title">Quem está avaliando?</div>
-                <input type="text" id="user_name" class="input-box" placeholder="Seu Nome (Opcional)">
-
-                <button class="btn btn-enviar" onclick="finishSurvey()">Enviar Avaliação</button>
+            <div id="dashboard-content" style="padding:10px;"></div>
+            <div style="padding: 20px; text-align: center;">
+                <button onclick="clearDatabase()" style="background:var(--danger); color:white; border:none; padding:10px; border-radius:8px; cursor:pointer;">LIMPAR BANCO DE DADOS</button>
             </div>
-        </div>
-
-        <div id="step4" class="step-container" style="text-align: center; padding: 80px 20px;">
-            <div style="font-size: 5rem; margin-bottom: 20px;">✅</div>
-            <h2>Avaliação enviada com sucesso!</h2>
-            <p style="color:#666; font-size: 1.1rem;">Obrigado por colaborar. Sua voz ajuda a construir um transporte público melhor para todos.</p>
         </div>
     </div>
 
     <script>
+        let db = JSON.parse(localStorage.getItem('avaliebus_db')) || [];
         let startTime, waitInterval;
-        let busData = { esperaTotal: '', lotacao: '' };
+        let busData = { segs: 0, format: '', lot: '' };
+
+        function toggleMode(m) {
+            document.getElementById('view-user').style.display = m === 'user' ? 'block' : 'none';
+            document.getElementById('view-adm').style.display = m === 'adm' ? 'block' : 'none';
+            document.getElementById('nav-user').className = m === 'user' ? 'active' : '';
+            document.getElementById('nav-adm').className = m === 'adm' ? 'active' : '';
+            if(m === 'adm') renderDashboard();
+        }
 
         function startWait() { 
-            startTime = new Date(); 
-            showStep(2); 
-            waitInterval = setInterval(updateTimer, 1000); 
+            startTime = new Date(); showStep(2); 
+            waitInterval = setInterval(() => {
+                let d = Math.floor((new Date() - startTime) / 1000);
+                document.getElementById('timer').innerText = Math.floor(d/60).toString().padStart(2,'0')+":"+(d%60).toString().padStart(2,'0');
+                busData.segs = d;
+                busData.format = `${Math.floor(d/60)}min e ${d%60}s`;
+            }, 1000); 
         }
 
-        function updateTimer() {
-            let diff = Math.floor((new Date() - startTime) / 1000);
-            let mins = Math.floor(diff/60);
-            let secs = diff%60;
-            document.getElementById('timer').innerText = mins.toString().padStart(2,'0') + ":" + secs.toString().padStart(2,'0');
-            busData.esperaTotal = `${mins}min e ${secs}s`;
-        }
-
-        function setCrowd(val, id) {
-            busData.lotacao = val;
+        function setCrowd(v, id) {
+            busData.lot = v;
             document.querySelectorAll('.btn-lot').forEach(b => b.classList.remove('btn-selected'));
             document.getElementById(id).classList.add('btn-selected');
         }
 
         function showStep(n) {
-            if(n === 3) {
-                clearInterval(waitInterval);
-                document.getElementById('wait-msg-text').innerText = `Você esperou exatamente ${busData.esperaTotal} por este ônibus.`;
-            }
+            if(n === 3) { clearInterval(waitInterval); document.getElementById('wait-msg-text').innerText = `Você esperou exatamente ${busData.format} por este ônibus.`; }
             document.querySelectorAll('.step-container').forEach(s => s.classList.remove('step-active'));
             document.getElementById('step'+n).classList.add('step-active');
             window.scrollTo(0,0);
         }
 
         function finishSurvey() {
-            if(!document.getElementById('bus_line').value || !busData.lotacao) {
-                alert("Por favor, informe a Linha e a Lotação."); return;
-            }
+            const linha = document.getElementById('bus_line').value;
+            if(!linha || !busData.lot) { alert("Preencha Linha e Lotação!"); return; }
+
+            const agora = new Date();
+            db.push({
+                linha: linha.toUpperCase(),
+                espera: busData.format,
+                lotacao: busData.lot,
+                nome: document.getElementById('user_name').value || "Anônimo",
+                data: agora.toLocaleDateString(),
+                hora: agora.toLocaleTimeString(),
+                notas: {
+                    esp: document.getElementById('r_espera_nota').value,
+                    mot: document.getElementById('r_motorista').value,
+                    cob: document.getElementById('r_cobrador').value,
+                    lim: document.getElementById('r_limpeza').value,
+                    bnc: document.getElementById('r_bancos').value
+                },
+                ocorrencias: [
+                    document.getElementById('c_vendedor').checked ? "Ambulantes" : null,
+                    document.getElementById('c_tras').checked ? "Porta Trás" : null,
+                    document.getElementById('c_assedio').checked ? "Assédio" : null,
+                    document.getElementById('c_assalto').checked ? "Assalto" : null,
+                    document.getElementById('c_idosos').checked ? "PCD/Idosos" : null,
+                    document.getElementById('c_briga').checked ? "Briga" : null,
+                    document.getElementById('c_direcao').checked ? "Dir. Perigosa" : null
+                ].filter(x => x)
+            });
+            localStorage.setItem('avaliebus_db', JSON.stringify(db));
             showStep(4);
+        }
+
+        function renderDashboard() {
+            const container = document.getElementById('dashboard-content');
+            container.innerHTML = "";
+            if(db.length === 0) { container.innerHTML = "<p style='text-align:center;'>Nenhum dado.</p>"; return; }
+
+            const linhas = {};
+            db.forEach(av => {
+                if(!linhas[av.linha]) linhas[av.linha] = [];
+                linhas[av.linha].push(av);
+            });
+
+            for(let l in linhas) {
+                let card = document.createElement('div');
+                card.className = 'dash-card';
+                card.innerHTML = `<div onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'block' ? 'none' : 'block'">
+                    <strong>LINHA: ${l}</strong> (${linhas[l].length} envios) ▾
+                </div>
+                <div class="details-area">
+                    ${linhas[l].map(av => `
+                        <div class="detail-item">
+                            <b>👤 ${av.nome}</b> - ${av.data} às ${av.hora}<br>
+                            ⏱️ ${av.espera} | 👥 ${av.lotacao}<br>
+                            <div style="margin-top:5px;">
+                                <span class="tag-nota">Espera: ${av.notas.esp}</span>
+                                <span class="tag-nota">Moto: ${av.notas.mot}</span>
+                                <span class="tag-nota">Cob: ${av.notas.cob}</span>
+                                <span class="tag-nota">Limpeza: ${av.notas.lim}</span>
+                                <span class="tag-nota">Bancos: ${av.notas.bnc}</span>
+                            </div>
+                            <div style="color:var(--danger); font-weight:bold; margin-top:5px;">${av.ocorrencias.length > 0 ? '⚠️ ' + av.ocorrencias.join(', ') : ''}</div>
+                        </div>
+                    `).join('')}
+                </div>`;
+                container.appendChild(card);
+            }
+        }
+
+        function clearDatabase() {
+            if(confirm("Deseja apagar todas as avaliações?")) { db = []; localStorage.removeItem('avaliebus_db'); renderDashboard(); }
         }
     </script>
 </body>
