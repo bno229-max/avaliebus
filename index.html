@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Avaliebus - Gestão de Qualidade</title>
+    <title>Avaliebus - Versão Final Validada + GPS</title>
     <style>
         :root { 
             --primary: #00b894; --secondary: #0984e3; --warning: #fdcb6e; 
@@ -12,7 +12,7 @@
         }
         body { font-family: 'Segoe UI', sans-serif; background: var(--light); margin: 0; padding: 0; }
         
-        /* Navegação */
+        /* Navegação Superior */
         .nav-toggle { position: absolute; top: 15px; right: 15px; display: flex; gap: 5px; z-index: 100; }
         .nav-toggle a { color: rgba(255,255,255,0.7); text-decoration: none; cursor: pointer; padding: 4px 12px; border-radius: 15px; font-size: 0.65rem; font-weight: bold; border: 1px solid rgba(255,255,255,0.3); transition: 0.3s; background: rgba(0,0,0,0.1); }
         .nav-toggle a.active { background: white; color: var(--dark); border-color: white; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
@@ -23,11 +23,13 @@
         .header h1 { margin: 0; font-size: 1.8rem; letter-spacing: 1px; }
         .header p { margin: 5px 0 0; font-size: 0.85rem; opacity: 0.9; }
         
-        /* Botões e Inputs */
+        .card { margin: 15px; padding: 20px; border-radius: 15px; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; }
+        
+        /* Botões com Efeitos Validados */
         .btn { border: none; border-radius: 12px; padding: 18px; font-weight: bold; cursor: pointer; width: 100%; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); font-size: 1rem; margin-top: 10px; outline: none; display: block; box-sizing: border-box; }
         .btn:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); filter: brightness(1.1); }
 
-        /* Farol de Lotação */
+        /* Farol de Lotação com Glow */
         .farol-container { display: flex; gap: 6px; margin-bottom: 10px; }
         .btn-lot { border: 3px solid transparent; padding: 12px 2px; font-size: 0.65rem; flex: 1; text-transform: uppercase; border-radius: 8px; cursor: pointer; font-weight: 800; transition: all 0.3s ease; }
         .btn-lot:hover { transform: scale(1.08); }
@@ -37,15 +39,16 @@
         .btn-super { background: var(--purple); color: white; }
         .btn-selected { border-color: #000 !important; transform: scale(1.1) !important; box-shadow: 0 0 20px rgba(0,0,0,0.3) !important; z-index: 2; }
 
-        /* Formulário */
+        /* Seções e Alinhamento */
         .section-title { color: var(--secondary); border-left: 5px solid var(--secondary); padding-left: 12px; margin: 25px 0 10px 0; font-size: 0.95rem; font-weight: 800; text-transform: uppercase; }
-        .rating-box { background: #f8f9fa; padding: 12px; border-radius: 12px; border: 1px solid #eee; margin-bottom: 10px; }
+        .rating-box { background: #f8f9fa; padding: 12px; border-radius: 12px; border: 1px solid #eee; margin-bottom: 10px; box-sizing: border-box; }
         .rating-box label { display: block; font-weight: bold; font-size: 0.8rem; color: #555; margin-bottom: 5px; }
         .rating-box select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 0.9rem; background: white; cursor: pointer; }
+        
         .check-group { background:#fff5f5; padding: 15px; border-radius: 12px; border: 1px solid #ffe3e3; }
         .check-item { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 0.85rem; cursor: pointer; }
 
-        /* ADM Profissional */
+        /* ADM */
         .header-adm { background: var(--secondary) !important; }
         .dash-card { margin: 15px; border-radius: 16px; background: #fff; border: 1px solid #edf2f7; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow: hidden; }
         .dash-card-header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: #fff; }
@@ -57,13 +60,15 @@
         .stat-label { display: block; font-size: 0.6rem; color: #718096; font-weight: 800; }
         .stat-value { font-size: 1.1rem; font-weight: 700; color: var(--dark); }
 
-        /* Detalhes Individuais Expandidos */
+        /* Detalhes Individuais (Restaurado Completo) */
         .details-area { display: none; background: #f8fafc; padding: 10px; border-top: 1px solid #edf2f7; }
         .detail-item { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #e2e8f0; font-size: 0.8rem; }
         .detail-header { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 8px; color: #718096; font-size: 0.7rem; }
         .detail-notes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-top: 8px; }
         .tag-nota { background: #f1f2f6; padding: 4px; border-radius: 4px; text-align: center; font-size: 0.65rem; font-weight: bold; border: 1px solid #eee; }
         .tag-ocorr { color: var(--danger); font-weight: bold; margin-top: 8px; display: block; font-size: 0.75rem; border-top: 1px dashed #feb2b2; padding-top: 5px; }
+        .map-btn { display: inline-block; margin-top: 10px; color: var(--secondary); text-decoration: none; font-weight: 800; font-size: 0.7rem; border: 1px solid var(--secondary); padding: 5px 10px; border-radius: 6px; transition: 0.3s; }
+        .map-btn:hover { background: var(--secondary); color: white; }
 
         .step-container { display: none; padding: 10px; }
         .step-active { display: block; animation: fadeIn 0.4s; }
@@ -173,7 +178,7 @@
     <script>
         let db = JSON.parse(localStorage.getItem('avaliebus_db')) || [];
         let startTime, waitInterval;
-        let busData = { format: '', lot: '' };
+        let busData = { format: '', lot: '', lat: null, lng: null };
 
         function toggleMode(m) {
             document.getElementById('view-user').style.display = m === 'user' ? 'block' : 'none';
@@ -183,7 +188,15 @@
             if(m === 'adm') renderDashboard();
         }
 
-        function startWait() { 
+        function startWait() {
+            // Captura Localização Silenciosa ao clicar
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((pos) => {
+                    busData.lat = pos.coords.latitude;
+                    busData.lng = pos.coords.longitude;
+                });
+            }
+            
             startTime = new Date(); showStep(2); 
             waitInterval = setInterval(() => {
                 let d = Math.floor((new Date() - startTime) / 1000);
@@ -210,6 +223,7 @@
             if(!linha || !busData.lot) { alert("Informe Linha e Lotação!"); return; }
             db.push({
                 linha: linha.toUpperCase(), espera_txt: busData.format, lot: busData.lot,
+                lat: busData.lat, lng: busData.lng,
                 nome: document.getElementById('user_name').value || "Anônimo",
                 data: new Date().toLocaleDateString(), hora: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
                 notas: {
@@ -225,8 +239,8 @@
                     document.getElementById('c_a').checked ? "Assédio" : null,
                     document.getElementById('c_r').checked ? "Assalto" : null,
                     document.getElementById('c_i').checked ? "PCD/Idosos" : null,
-                    document.getElementById('c_b').checked ? "Brigas" : null,
-                    document.getElementById('c_d').checked ? "Direção" : null
+                    document.getElementById('c_b').checked ? "Briga" : null,
+                    document.getElementById('c_d').checked ? "Perigo" : null
                 ].filter(x => x)
             });
             localStorage.setItem('avaliebus_db', JSON.stringify(db));
@@ -272,13 +286,14 @@
                                 </div>
                                 <div><b>⏱️ Espera:</b> ${av.espera_txt} | <b>👥 Lotação:</b> ${av.lot}</div>
                                 <div class="detail-notes-grid">
-                                    <div class="tag-nota">Espera: ${av.notas.esp}★</div>
-                                    <div class="tag-nota">Moto: ${av.notas.mot}★</div>
+                                    <div class="tag-nota">Esp: ${av.notas.esp}★</div>
+                                    <div class="tag-nota">Mot: ${av.notas.mot}★</div>
                                     <div class="tag-nota">Cob: ${av.notas.cob > 0 ? av.notas.cob + '★' : 'N/A'}</div>
-                                    <div class="tag-nota">Limp: ${av.notas.lim}★</div>
+                                    <div class="tag-nota">Lim: ${av.notas.lim}★</div>
                                     <div class="tag-nota">Banc: ${av.notas.bnc}★</div>
                                 </div>
                                 ${av.ocorr.length > 0 ? `<span class="tag-ocorr">⚠️ ${av.ocorr.join(', ')}</span>` : ''}
+                                ${av.lat ? `<a href="https://www.google.com/maps?q=${av.lat},${av.lng}" target="_blank" class="map-btn">📍 VER NO MAPA</a>` : ''}
                             </div>
                         `).join('')}
                     </div>
