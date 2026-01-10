@@ -3,199 +3,211 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Avaliebus - Dashboard ADM</title>
+    <title>Avaliebus | Experiência Premium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAyeljGisp0yk242H4s3VC_xFeBwESDrjU"></script>
+    
     <style>
-        :root { 
-            --primary: #00b894; --secondary: #0984e3; --warning: #fdcb6e; 
-            --danger: #d63031; --purple: #6c5ce7; --dark: #2d3436; 
-            --light: #f1f2f6; --success-light: #55efc4;
+        :root {
+            --bg: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --primary: #38bdf8;
+            --primary-glow: rgba(56, 189, 248, 0.5);
+            --success: #22c55e;
+            --success-glow: rgba(34, 197, 94, 0.5);
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --critical: #a855f7;
+            --text: #f1f5f9;
+            --text-dim: #94a3b8;
         }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--light); margin: 0; padding: 0; }
-        
-        .nav-toggle { position: absolute; top: 15px; right: 15px; display: flex; gap: 5px; z-index: 100; }
-        .nav-toggle a { color: rgba(255,255,255,0.7); text-decoration: none; cursor: pointer; padding: 4px 12px; border-radius: 15px; font-size: 0.65rem; font-weight: bold; border: 1px solid rgba(255,255,255,0.3); transition: 0.3s; background: rgba(0,0,0,0.1); }
-        .nav-toggle a.active { background: white; color: var(--dark); border-color: white; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
 
-        .app-container { max-width: 500px; margin: 0 auto; background: #fff; min-height: 100vh; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.1); }
-        .header { background: var(--primary); color: white; padding: 45px 20px 25px; text-align: center; }
-        .header h1 { margin: 0; font-size: 1.8rem; letter-spacing: 1px; }
-        .header p { margin: 5px 0 0; font-size: 0.85rem; opacity: 0.9; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
-        .btn { border: none; border-radius: 12px; padding: 18px; font-weight: bold; cursor: pointer; width: 100%; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); font-size: 1rem; margin-top: 10px; outline: none; display: block; box-sizing: border-box; text-align: center; text-decoration: none; }
-        .btn:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); filter: brightness(1.1); }
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: radial-gradient(circle at top right, #1e293b, #0f172a); 
+            margin: 0; padding: 0; color: var(--text);
+            min-height: 100vh; overflow-x: hidden;
+        }
 
-        /* Botão Cheguei Menor */
-        .btn-small { padding: 12px 25px; width: auto; margin: 20px auto; display: inline-block; font-size: 0.9rem; }
+        .app-container { max-width: 480px; margin: 0 auto; position: relative; }
+
+        .header { 
+            padding: 60px 25px 40px; text-align: center;
+            background: linear-gradient(to bottom, rgba(56, 189, 248, 0.1), transparent);
+        }
+        .header h1 { margin: 0; font-size: 2.4rem; font-weight: 800; color: var(--primary); text-shadow: 0 0 20px var(--primary-glow); letter-spacing: -1px; }
+        .header p { margin: 10px 0 0; font-size: 0.95rem; color: var(--text-dim); }
+
+        .content { padding: 0 20px 60px; }
+
+        /* Botões com Efeito de Brilho */
+        .btn { 
+            border: none; border-radius: 20px; padding: 22px; font-weight: 800; 
+            cursor: pointer; width: 100%; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            font-size: 1rem; text-transform: uppercase; letter-spacing: 1.5px;
+        }
+        .btn-main { background: var(--primary); color: #000; box-shadow: 0 10px 20px -5px var(--primary-glow); }
+        .btn-main:hover { transform: translateY(-4px); filter: brightness(1.2); box-shadow: 0 15px 30px -5px var(--primary-glow); }
+
+        .btn-finish { background: var(--success); color: white; margin-top: 30px; box-shadow: 0 10px 20px -5px var(--success-glow); }
+        .btn-finish:hover { transform: translateY(-4px); box-shadow: 0 15px 30px -5px var(--success-glow); }
+
+        .card { 
+            background: var(--card-bg); border-radius: 28px; padding: 25px; 
+            margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.08);
+            backdrop-filter: blur(12px); box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
 
         /* Farol de Lotação */
-        .farol-container { display: flex; gap: 6px; margin-bottom: 10px; }
-        .btn-lot { border: 3px solid transparent; padding: 12px 2px; font-size: 0.65rem; flex: 1; text-transform: uppercase; border-radius: 8px; cursor: pointer; font-weight: 800; color: white !important; transition: 0.3s; }
-        .btn-vazio { background: var(--primary); }
-        .btn-medio { background: var(--warning); }
-        .btn-lotado { background: var(--danger); }
-        .btn-super { background: var(--purple); }
+        .farol-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 10px; }
+        .btn-lot { 
+            border: 2px solid rgba(255,255,255,0.1); padding: 18px 5px; border-radius: 18px; 
+            color: white; font-weight: 800; font-size: 0.8rem; background: rgba(255,255,255,0.03); cursor: pointer; transition: 0.3s;
+        }
+        .active-vazio { background: var(--success) !important; border-color: var(--success) !important; box-shadow: 0 0 15px var(--success-glow); }
+        .active-medio { background: var(--warning) !important; border-color: var(--warning) !important; box-shadow: 0 0 15px rgba(245, 158, 11, 0.5); }
+        .active-lotado { background: var(--danger) !important; border-color: var(--danger) !important; box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
+        .active-critico { background: var(--critical) !important; border-color: var(--critical) !important; box-shadow: 0 0 15px rgba(168, 85, 247, 0.5); }
 
-        .btn-vazio.btn-selected { border-color: white !important; animation: glow-vazio 1.5s infinite; }
-        .btn-medio.btn-selected { border-color: white !important; animation: glow-medio 1.5s infinite; }
-        .btn-lotado.btn-selected { border-color: white !important; animation: glow-lotado 1.5s infinite; }
-        .btn-super.btn-selected { border-color: white !important; animation: glow-super 1.5s infinite; }
-
-        @keyframes glow-vazio { 0%, 100% { box-shadow: 0 0 5px var(--primary); } 50% { box-shadow: 0 0 20px var(--primary); } }
-        @keyframes glow-medio { 0%, 100% { box-shadow: 0 0 5px var(--warning); } 50% { box-shadow: 0 0 20px var(--warning); } }
-        @keyframes glow-lotado { 0%, 100% { box-shadow: 0 0 5px var(--danger); } 50% { box-shadow: 0 0 20px var(--danger); } }
-        @keyframes glow-super { 0%, 100% { box-shadow: 0 0 5px var(--purple); } 50% { box-shadow: 0 0 20px var(--purple); } }
-
-        .section-title { color: var(--secondary); border-left: 5px solid var(--secondary); padding-left: 12px; margin: 25px 0 10px 0; font-size: 0.95rem; font-weight: 800; text-transform: uppercase; }
-        .rating-box { background: #f8f9fa; padding: 12px; border-radius: 12px; border: 1px solid #eee; margin-bottom: 10px; }
-        .rating-box select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 0.9rem; background: white; }
+        .label-group { color: var(--primary); font-size: 0.75rem; font-weight: 800; text-transform: uppercase; margin: 30px 5px 15px; display: block; letter-spacing: 2px; }
         
-        .check-group { background:#fff5f5; padding: 15px; border-radius: 12px; border: 1px solid #ffe3e3; }
-        .check-item { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 0.85rem; cursor: pointer; }
+        select, input[type="text"], textarea {
+            width: 100%; padding: 18px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1);
+            background: #0f172a; color: white; font-family: inherit; font-size: 1rem; margin-bottom: 15px; outline: none;
+        }
 
-        .dash-card { margin: 15px; border-radius: 16px; background: #fff; border: 1px solid #edf2f7; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow: hidden; }
-        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: #edf2f7; border-top: 1px solid #edf2f7; }
-        .stat-box { background: #fff; padding: 12px; text-align: center; }
+        .rating-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .rating-row span { font-size: 0.9rem; font-weight: 600; color: var(--text-dim); }
+        .rating-row select { width: 130px; margin-bottom: 0; padding: 10px; border-radius: 12px; }
 
-        .step-container { display: none; padding: 10px; }
-        .step-active { display: block; animation: fadeIn 0.4s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .occ-item { 
+            display: flex; align-items: center; background: rgba(255,255,255,0.03); 
+            padding: 16px; border-radius: 18px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer; transition: 0.3s;
+        }
+        .occ-item input { margin-right: 15px; width: 22px; height: 22px; accent-color: var(--primary); }
+
+        #timer { font-size: 5.5rem; font-weight: 800; color: var(--primary); text-shadow: 0 0 40px var(--primary-glow); margin: 20px 0; text-align: center; letter-spacing: -3px; }
+
+        .step { display: none; }
+        .step-active { display: block; animation: fadeInUp 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Check Animado */
+        .check-container { margin: 20px auto; width: 80px; height: 80px; background: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px var(--success-glow); }
+        .check-icon { font-size: 3rem; color: white; animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes pop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body>
 
-    <div class="nav-toggle">
-        <a id="nav-user" class="active" onclick="toggleMode('user')">USUÁRIO</a>
-        <a id="nav-adm" onclick="toggleMode('adm')">ADM</a>
-    </div>
-
     <div class="app-container">
-        <div id="view-user">
-            <div class="header">
-                <h1>Avaliebus</h1>
-                <p>Participe e ajude a melhorar a qualidade do transporte público</p>
-            </div>
-
-            <div id="step1" class="step-container step-active">
-                <div class="card" style="text-align: center; padding: 40px 20px;">
-                    <div style="font-size: 4rem; margin-bottom: 15px;">📍</div>
-                    <h3>Chegou no ponto de ônibus agora?</h3>
-                    <p style="color: #666; font-size: 0.9rem;">Clique no botão abaixo para medir quanto tempo até seu ônibus chegar</p>
-                    <button class="btn btn-small" style="background: var(--secondary); color:white;" onclick="initProcess()">CHEGUEI AGORA</button>
-                </div>
-            </div>
-
-            <div id="step2" class="step-container">
-                <div class="card" style="text-align: center; padding: 20px;">
-                    <h3 style="color: #666;">Tempo de espera:</h3>
-                    <div id="timer" style="font-size: 3.5rem; font-weight: 800; color: var(--secondary); margin: 20px 0; font-family: monospace;">00:00</div>
-                    <button class="btn" style="background: var(--primary); color:white;" onclick="showStep(3)">SUBI NO ÔNIBUS</button>
-                </div>
-            </div>
-
-            <div id="step3" class="step-container">
-                <div class="card">
-                    <div style="background: #e1f5fe; color:#01579b; margin-bottom:20px; padding: 15px; border-radius: 12px; font-weight: bold; text-align: center; border: 1px solid #b3e5fc;">
-                        ⏱️ <span id="wait-msg-text"></span>
-                    </div>
-
-                    <div class="section-title">Identificação</div>
-                    <input type="text" id="bus_line" class="btn" style="background:white; border:2px solid #ddd; text-align:center; color:black; cursor:text;" placeholder="Número da Linha">
-
-                    <div class="section-title">Farol de Lotação</div>
-                    <div class="farol-container">
-                        <button class="btn-lot btn-vazio" id="btn-v" onclick="setCrowd('Vazio', 'btn-v')">Vazio</button>
-                        <button class="btn-lot btn-medio" id="btn-m" onclick="setCrowd('Médio', 'btn-m')">Médio</button>
-                        <button class="btn-lot btn-lotado" id="btn-l" onclick="setCrowd('Lotado', 'btn-l')">Lotado</button>
-                        <button class="btn-lot btn-super" id="btn-s" onclick="setCrowd('Impossível', 'btn-s')">Impossível</button>
-                    </div>
-
-                    <div class="section-title">Notas de Qualidade</div>
-                    <div class="rating-box">
-                        <label>Nota do Tempo de Espera</label>
-                        <select id="r_esp">
-                            <option value="5">5★ Excelente (Muito rápido)</option>
-                            <option value="4">4★ Bom (Dentro do esperado)</option>
-                            <option value="3" selected>3★ Regular (Demorou um pouco)</option>
-                            <option value="2">2★ Ruim (Demora excessiva)</option>
-                            <option value="1">1★ Péssimo (Inaceitável)</option>
-                        </select>
-                    </div>
-                    <div class="rating-box">
-                        <label>Motorista (Educação/Condução)</label>
-                        <select id="r_mot"><option value="5">5★ Excelente</option><option value="4">4★ Bom</option><option value="3" selected>3★ Regular</option><option value="2">2★ Ruim</option><option value="1">1★ Péssimo</option></select>
-                    </div>
-                    <div class="rating-box">
-                        <label>Cobrador (Educação/Atendimento)</label>
-                        <select id="r_cob"><option value="5">5★ Excelente</option><option value="3" selected>3★ Regular</option><option value="1">1★ Péssimo</option><option value="0">Não tem</option></select>
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <div class="rating-box">
-                            <label>Limpeza</label>
-                            <select id="r_lim"><option value="5">5★ Limpo</option><option value="3" selected>3★ Sujo</option><option value="1">1★ Muito Sujo</option></select>
-                        </div>
-                        <div class="rating-box">
-                            <label>Bancos</label>
-                            <select id="r_bnc"><option value="5">5★ Novos</option><option value="3" selected>3★ Usados</option><option value="1">1★ Quebrados</option></select>
-                        </div>
-                    </div>
-
-                    <div class="section-title">Presenciou algo do tipo hoje?</div>
-                    <div class="check-group">
-                        <label class="check-item"><input type="checkbox" id="c_v"> 🥖 Vendedores Ambulantes</label>
-                        <label class="check-item"><input type="checkbox" id="c_t"> 🚪 Entraram pela porta de trás</label>
-                        <label class="check-item"><input type="checkbox" id="c_a"> ⚠️ Assédio</label>
-                        <label class="check-item"><input type="checkbox" id="c_r"> ⚠️ Assalto / Roubo</label>
-                        <label class="check-item"><input type="checkbox" id="c_i"> Desrespeito a Idosos / PCD</label>
-                        <label class="check-item"><input type="checkbox" id="c_b"> Brigas ou Confusões</label>
-                        <label class="check-item"><input type="checkbox" id="c_d"> Direção Perigosa</label>
-                    </div>
-
-                    <input type="text" id="user_name" class="btn" style="background:white; border:2px solid #ddd; text-align:center; color:black; margin-top:20px; cursor:text;" placeholder="Seu Nome (Opcional)">
-                    <button class="btn" style="background:var(--primary); color:white;" onclick="finishSurvey()">ENVIAR AVALIAÇÃO</button>
-                </div>
-            </div>
-
-            <div id="step4" class="step-container" style="text-align: center; padding: 100px 20px;">
-                <div style="font-size: 5rem;">✅</div>
-                <h2>Enviado com Sucesso!</h2>
-                <button class="btn" style="background:var(--primary); color:white; margin-top:20px;" onclick="window.location.reload()">NOVA AVALIAÇÃO</button>
-            </div>
+        <div class="header">
+            <h1>AVALIEBUS</h1>
+            <p>Sua avaliação ajuda a gente evoluir.</p>
         </div>
 
-        <div id="view-adm" style="display:none;">
-            <div class="header" style="background: var(--secondary);">
-                <h1>Dashboard ADM</h1>
-                <p>Gestão de Qualidade V3.0</p>
+        <div class="content">
+            <div id="step1" class="step step-active">
+                <div class="card" style="text-align: center; padding: 60px 20px;">
+                    <div style="font-size: 5rem; margin-bottom: 25px;">📍</div>
+                    <h2 style="font-weight: 800;">No ponto agora?</h2>
+                    <p style="color: var(--text-dim); margin-bottom: 30px;">Inicie o cronômetro para marcar seu tempo de espera.</p>
+                    <button class="btn btn-main" onclick="startWait()">Cheguei Agora</button>
+                </div>
             </div>
-            <div id="dashboard-content"></div>
+
+            <div id="step2" class="step">
+                <div class="card">
+                    <span class="label-group" style="text-align:center">Tempo de Espera</span>
+                    <div id="timer">00:00</div>
+                    <button class="btn btn-main" onclick="showStep(3)">Embarquei Agora</button>
+                </div>
+            </div>
+
+            <div id="step3" class="step">
+                <div class="card" style="background: linear-gradient(135deg, var(--primary), #0ea5e9); color: #000; text-align: center; padding: 20px;">
+                    <span style="font-size: 0.75rem; font-weight: 800;">ESPERA REGISTRADA</span>
+                    <div id="wait-msg-text" style="font-size: 1.5rem; font-weight: 800;">0min e 0s</div>
+                </div>
+
+                <span class="label-group">Identificação</span>
+                <input type="text" id="bus_line" placeholder="Número da Linha">
+
+                <span class="label-group">Como está a lotação?</span>
+                <div class="farol-grid">
+                    <button class="btn-lot" id="lot1" onclick="setCrowd('Vazio', 'lot1', 'active-vazio')">VAZIO</button>
+                    <button class="btn-lot" id="lot2" onclick="setCrowd('Médio', 'lot2', 'active-medio')">MÉDIO</button>
+                    <button class="btn-lot" id="lot3" onclick="setCrowd('Lotado', 'lot3', 'active-lotado')">LOTADO</button>
+                    <button class="btn-lot" id="lot4" onclick="setCrowd('Crítico', 'lot4', 'active-critico')">CRÍTICO</button>
+                </div>
+
+                <span class="label-group">Qualidade de atendimento</span>
+                <div class="card">
+                    <div class="rating-row"><span>Atendimento Motorista</span><select id="n_mot"><option value="5">5 - Ótimo</option><option value="4">4 - Bom</option><option value="3" selected>3 - Regular</option><option value="2">2 - Ruim</option><option value="1">1 - Péssimo</option></select></div>
+                    <div class="rating-row"><span>Atendimento Cobrador</span><select id="n_cob"><option value="5">5 - Ótimo</option><option value="3" selected>3 - Regular</option><option value="1">1 - Péssimo</option><option value="0">Não possui</option></select></div>
+                    <div class="rating-row"><span>Limpeza</span><select id="n_lim"><option value="5">5 - Limpo</option><option value="3" selected>3 - Aceitável</option><option value="1">1 - Sujo</option></select></div>
+                    <div class="rating-row"><span>Conforto</span><select id="n_conf"><option value="5">5 - Ótimo</option><option value="3" selected>3 - Regular</option><option value="1">1 - Ruim</option></select></div>
+                </div>
+
+                <span class="label-group">Presenciou algo hoje?</span>
+                <div class="check-list">
+                    <label class="occ-item"><input type="checkbox" name="occ" value="Ambulantes"> Ambulantes</label>
+                    <label class="occ-item"><input type="checkbox" name="occ" value="Porta Trás"> Entrada pela porta de trás</label>
+                    <label class="occ-item"><input type="checkbox" name="occ" value="Assédio"> Assédio</label>
+                    <label class="occ-item"><input type="checkbox" name="occ" value="Assalt"> Assalto / Roubo</label>
+                    <label class="occ-item"><input type="checkbox" name="occ" value="Direção"> Direção Perigosa</label>
+                    <label class="occ-item"><input type="checkbox" name="occ" value="Viagem normal"> Viagem normal</label>
+                </div>
+
+                <span class="label-group">Comentários sobre a viagem (opcional)</span>
+                <textarea id="user_comment" rows="3" placeholder="Algo mais que queira contar?"></textarea>
+
+                <span class="label-group">Seu Nome (opcional)</span>
+                <input type="text" id="user_name" placeholder="Seu nome">
+
+                <button class="btn btn-finish" onclick="finishSurvey()">Finalizar Avaliação</button>
+            </div>
+
+            <div id="step4" class="step">
+                <div class="card" style="text-align: center; padding: 40px 20px;">
+                    <div class="check-container">
+                        <div class="check-icon">✓</div>
+                    </div>
+                    <h2 style="color: var(--success); font-weight: 800; margin-top: 20px;">Enviado!</h2>
+                    <p style="color: var(--text-dim);">Obrigado pela sua contribuição.</p>
+                    <button class="btn btn-main" onclick="window.location.reload()">Nova Avaliação</button>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        let db = JSON.parse(localStorage.getItem('avaliebus_db')) || [];
         let startTime, waitInterval;
-        let busData = { format: '', lot: '', coords: null };
+        let busData = { 
+            format: '', 
+            lot: '', 
+            coords: { lat: null, lng: null },
+            timestamp: null
+        };
 
-        function toggleMode(m) {
-            document.getElementById('view-user').style.display = m === 'user' ? 'block' : 'none';
-            document.getElementById('view-adm').style.display = m === 'adm' ? 'block' : 'none';
-            document.getElementById('nav-user').className = m === 'user' ? 'active' : '';
-            document.getElementById('nav-adm').className = m === 'adm' ? 'active' : '';
-            if(m === 'adm') renderDashboard();
-        }
-
-        function initProcess() {
-            if ("geolocation" in navigator) {
+        // Captura Geoposição
+        function captureLocation() {
+            if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition((pos) => {
-                    busData.coords = { lat: pos.coords.latitude, lon: pos.coords.longitude };
-                    startWait();
-                }, () => { startWait(); });
-            } else { startWait(); }
+                    busData.coords.lat = pos.coords.latitude;
+                    busData.coords.lng = pos.coords.longitude;
+                });
+            }
         }
 
         function startWait() { 
-            startTime = new Date(); showStep(2); 
+            startTime = new Date(); 
+            captureLocation(); // Coleta localização ao iniciar
+            showStep(2); 
             waitInterval = setInterval(() => {
                 let d = Math.floor((new Date() - startTime) / 1000);
                 document.getElementById('timer').innerText = Math.floor(d/60).toString().padStart(2,'0')+":"+(d%60).toString().padStart(2,'0');
@@ -203,95 +215,45 @@
             }, 1000); 
         }
 
-        function setCrowd(v, id) {
+        function setCrowd(v, id, activeClass) {
             busData.lot = v;
-            document.querySelectorAll('.btn-lot').forEach(b => b.classList.remove('btn-selected'));
-            document.getElementById(id).classList.add('btn-selected');
+            document.querySelectorAll('.btn-lot').forEach(b => {
+                b.classList.remove('active-vazio', 'active-medio', 'active-lotado', 'active-critico');
+            });
+            document.getElementById(id).classList.add(activeClass);
         }
 
         function showStep(n) {
-            if(n === 3) { clearInterval(waitInterval); document.getElementById('wait-msg-text').innerText = `Você esperou: ${busData.format}`; }
-            document.querySelectorAll('.step-container').forEach(s => s.classList.remove('step-active'));
+            if(n === 3) { clearInterval(waitInterval); document.getElementById('wait-msg-text').innerText = busData.format; }
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('step-active'));
             document.getElementById('step'+n).classList.add('step-active');
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        function launchConfetti() {
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#38bdf8', '#22c55e', '#ffffff']
+            });
         }
 
         function finishSurvey() {
-            const linha = document.getElementById('bus_line').value;
-            if(!linha || !busData.lot) { alert("Informe a Linha e a Lotação!"); return; }
-            
-            db.push({
-                linha: linha.toUpperCase(), espera_txt: busData.format, lot: busData.lot,
-                coords: busData.coords,
-                nome: document.getElementById('user_name').value || "Anônimo",
-                data: new Date().toLocaleDateString(), hora: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
-                notas: { 
-                    esp: parseInt(document.getElementById('r_esp').value), 
-                    mot: parseInt(document.getElementById('r_mot').value), 
-                    cob: parseInt(document.getElementById('r_cob').value),
-                    lim: parseInt(document.getElementById('r_lim').value),
-                    bnc: parseInt(document.getElementById('r_bnc').value)
-                },
-                ocorr: [
-                    document.getElementById('c_v').checked ? "Ambulantes" : null,
-                    document.getElementById('c_t').checked ? "Porta Trás" : null,
-                    document.getElementById('c_a').checked ? "Assédio" : null,
-                    document.getElementById('c_r').checked ? "Assalto" : null,
-                    document.getElementById('c_i').checked ? "PCD/Idosos" : null,
-                    document.getElementById('c_b').checked ? "Brigas" : null,
-                    document.getElementById('c_d').checked ? "Direção" : null
-                ].filter(x => x)
-            });
-            localStorage.setItem('avaliebus_db', JSON.stringify(db));
-            showStep(4);
-        }
-
-        function renderDashboard() {
-            const container = document.getElementById('dashboard-content');
-            container.innerHTML = "";
-            if(db.length === 0) { container.innerHTML = "<p style='text-align:center; padding:30px;'>Sem dados.</p>"; return; }
-            const linhas = {};
-            db.forEach(av => {
-                if(!linhas[av.linha]) linhas[av.linha] = { t:0, sE:0, sM:0, itens:[] };
-                linhas[av.linha].t++;
-                linhas[av.linha].sE += av.notas.esp;
-                linhas[av.linha].sM += av.notas.mot;
-                linhas[av.linha].itens.push(av);
-            });
-            for(let l in linhas) {
-                const i = linhas[l];
-                const card = document.createElement('div');
-                card.className = 'dash-card';
-                card.innerHTML = `
-                    <div style="padding:15px; cursor:pointer;" onclick="toggleCard(this)">
-                        <strong>LINHA ${l}</strong> <span style="float:right; color:var(--secondary); font-size:0.8rem;">VER ITENS (${i.t}) ▼</span>
-                    </div>
-                    <div class="stats-grid">
-                        <div class="stat-box"><span style="font-size:0.6rem; font-weight:bold;">⏱️ ESPERA</span><div style="font-size:1.1rem; font-weight:700;">${(i.sE/i.t).toFixed(1)}</div></div>
-                        <div class="stat-box"><span style="font-size:0.6rem; font-weight:bold;">👨‍✈️ MOTORISTA</span><div style="font-size:1.1rem; font-weight:700;">${(i.sM/i.t).toFixed(1)}</div></div>
-                    </div>
-                    <div class="details-area" style="display:none; padding:10px; background:#f8fafc; border-top:1px solid #edf2f7;">
-                        ${i.itens.slice().reverse().map(av => `
-                            <div style="background:white; padding:12px; border-radius:8px; margin-bottom:10px; border:1px solid #e2e8f0;">
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <b>👤 ${av.nome}</b>
-                                    ${av.coords ? `<a href="https://www.google.com/maps?q=${av.coords.lat},${av.coords.lon}" target="_blank" style="color:var(--secondary); text-decoration:underline; font-size:0.65rem; font-weight:bold;">ver no mapa</a>` : ''}
-                                </div>
-                                <div style="font-size:0.75rem; margin-top:5px; color:#444;">
-                                    ⏱️ <b>Espera:</b> ${av.espera_txt} | 👥 <b>Lotação:</b> ${av.lot}<br>
-                                    🧹 <b>Limpeza:</b> ${av.notas.lim}★ | 💺 <b>Bancos:</b> ${av.notas.bnc}★<br>
-                                    ${av.ocorr.length > 0 ? `<div style="color:var(--danger); margin-top:5px; font-weight:bold;">⚠️ ${av.ocorr.join(', ')}</div>` : ''}
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-                container.appendChild(card);
+            if(!document.getElementById('bus_line').value || !busData.lot) { 
+                alert("Preencha a linha e a lotação!"); 
+                return; 
             }
-        }
+            
+            // Captura Data e Hora exata
+            busData.timestamp = new Date().toLocaleString('pt-BR');
+            
+            // Console log para você ver os dados coletados (Simulando envio ADM futuro)
+            console.log("DADOS COLETADOS:", busData);
+            console.log("LINHA:", document.getElementById('bus_line').value);
 
-        function toggleCard(el) {
-            const det = el.nextElementSibling.nextElementSibling;
-            det.style.display = det.style.display === 'block' ? 'none' : 'block';
+            showStep(4);
+            launchConfetti();
         }
     </script>
 </body>
